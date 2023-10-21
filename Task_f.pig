@@ -1,6 +1,6 @@
-faceInPage = LOAD 'C:/Users/Simeon Krastev/Desktop/WPI/DS503/Project_2/FaceInPage.csv' USING PigStorage(',') as (ID:int, Name:chararray, Nationality:chararray, CountryCode:int, Hobby:chararray);
-associates = LOAD 'C:/Users/Simeon Krastev/Desktop/WPI/DS503/Project_2/Associates.csv' USING PigStorage(',') as (FriendRel:int, PersonA_ID:int, PersonB_ID:int, DateofFriendship:int, Descrip:chararray);
-accessLogs = LOAD 'C:/Users/Simeon Krastev/Desktop/WPI/DS503/Project_2/AccessLogs.csv' USING PigStorage(',') as (AccessId:int, ByWho:int, WhatPage:int, TypeOfAccess:chararray, AccessTime:int);
+faceInPage = LOAD 'hdfs://localhost:9000/project2/FaceInPage.csv' USING PigStorage(',') as (ID:int, Name:chararray, Nationality:chararray, CountryCode:int, Hobby:chararray);
+associates = LOAD 'hdfs://localhost:9000/project2/Associates.csv' USING PigStorage(',') as (FriendRel:int, PersonA_ID:int, PersonB_ID:int, DateofFriendship:int, Descrip:chararray);
+accessLogs = LOAD 'hdfs://localhost:9000/project2/AccessLogs.csv' USING PigStorage(',') as (AccessId:int, ByWho:int, WhatPage:int, TypeOfAccess:chararray, AccessTime:int);
 
 faceInPage = FILTER faceInPage BY NOT Nationality == 'Nationality';
 accessLogs = FILTER accessLogs BY NOT TypeOfAccess == 'TypeOfAccess';
@@ -29,5 +29,5 @@ formattedResult2 = FOREACH result2 GENERATE
 	formattedResult::PersonB_ID AS PersonB_ID,
 	faceInPage::Name AS NameB;
 	
-STORE formattedResult2 INTO 'Task_f_output';
+STORE formattedResult2 INTO 'hdfs://localhost:9000/project2/Task_f_output';
 

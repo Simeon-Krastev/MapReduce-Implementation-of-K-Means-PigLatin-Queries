@@ -1,5 +1,5 @@
-faceInPage = LOAD 'C:/Users/Simeon Krastev/Desktop/WPI/DS503/Project_2/FaceInPage.csv' USING PigStorage(',') as (ID:int, Name:chararray, Nationality:chararray, CountryCode:int, Hobby:chararray);
-associates = LOAD 'C:/Users/Simeon Krastev/Desktop/WPI/DS503/Project_2/Associates.csv' USING PigStorage(',') as (FriendRel:int, PersonA_ID:int, PersonB_ID:int, DateofFriendship:int, Descrip:chararray);
+faceInPage = LOAD 'hdfs://localhost:9000/project2/FaceInPage.csv' USING PigStorage(',') as (ID:int, Name:chararray, Nationality:chararray, CountryCode:int, Hobby:chararray);
+associates = LOAD 'hdfs://localhost:9000/project2/Associates.csv' USING PigStorage(',') as (FriendRel:int, PersonA_ID:int, PersonB_ID:int, DateofFriendship:int, Descrip:chararray);
 
 faceInPage = FILTER faceInPage BY NOT Nationality == 'Nationality';
 associates = FILTER associates BY NOT Descrip == 'Desc';
@@ -29,4 +29,4 @@ averageRelation = FOREACH average GENERATE 'Average' AS Name, average AS Relatio
 
 final_result = UNION popular, averageRelation;
 
-STORE final_result INTO 'Task_h_output';
+STORE final_result INTO 'hdfs://localhost:9000/project2/Task_h_output';

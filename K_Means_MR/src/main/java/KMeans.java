@@ -35,11 +35,19 @@ public class KMeans {
             try {
                 if (clusterCenters.isEmpty()) {
                     URI[] cacheFiles = context.getCacheFiles();
+//                    Path path = new Path(cacheFiles[0]);
+//                    FileSystem fs = FileSystem.get(context.getConfiguration());
+//                    FSDataInputStream fis = fs.open(path);
+//                    BufferedReader reader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+//                    String line;
+
                     Path path = new Path(cacheFiles[0]);
-                    FileSystem fs = FileSystem.get(context.getConfiguration());
+                    Configuration conf = context.getConfiguration();
+                    FileSystem fs = FileSystem.get(cacheFiles[0], conf);  // use the URI of the cache file to get the appropriate FileSystem instance
                     FSDataInputStream fis = fs.open(path);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
                     String line;
+
                     while (StringUtils.isNotEmpty(line = reader.readLine())) {
                         String[] seedPointLine = line.split(",");
                         seedPointLine[0] = seedPointLine[0].replace("\uFEFF", ""); //remove Byte Order Mark
@@ -94,7 +102,7 @@ public class KMeans {
         double minDistance = Double.MAX_VALUE;
 
         for (int i = 0; i < clusterCenters.size(); i++) {
-            double distance = calculateDistance(dataPoint, clusterCenters.get(i));
+            double distance = Utils.calculateDistance(dataPoint, clusterCenters.get(i));
             if (distance < minDistance) {
                 minDistance = distance;
                 nearestClusterIndex = i;
@@ -102,14 +110,6 @@ public class KMeans {
         }
 
         return clusterCenters.get(nearestClusterIndex);
-    }
-
-    private static double calculateDistance(int[] dataPoint, double[] centerPoint) {
-        int x1 = dataPoint[0];
-        int y1 = dataPoint[1];
-        double x2 = centerPoint[0];
-        double y2 = centerPoint[1];
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
     public static class KMeansCombiner extends Reducer<Text, Text, Text, Text> {
@@ -205,7 +205,9 @@ public class KMeans {
             double threshold = context.getConfiguration().getDouble("threshold", 0.0);
             int maxIterations = context.getConfiguration().getInt("maxIterations", 0);
             int iteration = context.getConfiguration().getInt("iteration", 0);
-
+            System.out.println(threshold);
+            System.out.println(maxIterations);
+            System.out.println(iteration);
             boolean convergence_reached = checkConvergence(threshold);
             if (convergence_reached) {
                 context.getCounter(ConvergenceCounter.CONVERGED).increment(1);
@@ -288,8 +290,7 @@ public class KMeans {
 
         long start = System.currentTimeMillis();
 
-        File output = new File(args[1].substring(8));
-        Utils.deleteDirectory(output);
+        Utils.deleteDirectory(args[2]);
 
         Configuration conf = new Configuration();
         System.out.println("Single Iteration K-Means");
@@ -300,10 +301,10 @@ public class KMeans {
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+        job.addCacheFile(new URI(args[1]));
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
         job.waitForCompletion(true);
         long end = System.currentTimeMillis();
@@ -315,12 +316,11 @@ public class KMeans {
 
         long start = System.currentTimeMillis();
 
-        int maxIterations = Integer.parseInt(args[2]);
+        int maxIterations = Integer.parseInt(args[3]);
 
         for (int i = 1; i < maxIterations + 1; i++) {
 
-            File output = new File(args[1].substring(8));
-            Utils.deleteDirectory(output);
+            Utils.deleteDirectory(args[2]);
 
             Configuration conf = new Configuration();
             System.out.println("Iteration " + i);
@@ -332,10 +332,10 @@ public class KMeans {
 
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
-            job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+            job.addCacheFile(new URI(args[1]));
 
             FileInputFormat.addInputPath(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(args[1]));
+            FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
             boolean jobSuccess = job.waitForCompletion(true);
             clusterCenterHistory.add(clusterCenters);
@@ -354,13 +354,12 @@ public class KMeans {
 
         long start = System.currentTimeMillis();
 
-        int maxIterations = Integer.parseInt(args[2]);
-        double threshold = Double.parseDouble(args[3]);
+        int maxIterations = Integer.parseInt(args[3]);
+        double threshold = Double.parseDouble(args[4]);
 
         for (int i = 1; i < maxIterations + 1; i++) {
 
-            File output = new File(args[1].substring(8));
-            Utils.deleteDirectory(output);
+            Utils.deleteDirectory(args[2]);
 
             Configuration conf = new Configuration();
             System.out.println("Iteration " + i);
@@ -374,9 +373,9 @@ public class KMeans {
 
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
-            job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+            job.addCacheFile(new URI(args[1]));
             FileInputFormat.addInputPath(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(args[1]));
+            FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
             boolean jobSuccess = job.waitForCompletion(true);
 
@@ -400,13 +399,12 @@ public class KMeans {
 
         long start = System.currentTimeMillis();
 
-        int maxIterations = Integer.parseInt(args[2]);
-        double threshold = Double.parseDouble(args[3]);
+        int maxIterations = Integer.parseInt(args[3]);
+        double threshold = Double.parseDouble(args[4]);
 
         for (int i = 1; i < maxIterations + 1; i++) {
 
-            File output = new File(args[1].substring(8));
-            Utils.deleteDirectory(output);
+            Utils.deleteDirectory(args[2]);
 
             Configuration conf = new Configuration();
             System.out.println("Iteration " + i);
@@ -422,9 +420,9 @@ public class KMeans {
 
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
-            job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+            job.addCacheFile(new URI(args[1]));
             FileInputFormat.addInputPath(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(args[1]));
+            FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
             boolean jobSuccess = job.waitForCompletion(true);
 
@@ -448,15 +446,13 @@ public class KMeans {
 
         long start = System.currentTimeMillis();
 
-        int maxIterations = Integer.parseInt(args[3]);
-        double threshold = Double.parseDouble(args[4]);
-
+        int maxIterations = Integer.parseInt(args[4]);
+        double threshold = Double.parseDouble(args[5]);
+        System.out.println(maxIterations);
         for (int i = 1; i < maxIterations + 1; i++) {
 
-            File output_i = new File(args[1].substring(8));
-            File output_ii = new File(args[2].substring(8));
-            Utils.deleteDirectory(output_i);
-            Utils.deleteDirectory(output_ii);
+            Utils.deleteDirectory(args[2]);
+            Utils.deleteDirectory(args[3]);
 
             Configuration conf = new Configuration();
             System.out.println("Iteration " + i);
@@ -472,9 +468,9 @@ public class KMeans {
 
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(Text.class);
-            job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+            job.addCacheFile(new URI(args[1]));
             FileInputFormat.addInputPath(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(args[1]));
+            FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
             boolean jobSuccess = job.waitForCompletion(true);
 
@@ -499,9 +495,9 @@ public class KMeans {
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        job.addCacheFile(new URI("file:///C:/Hadoop/SeedPoints.csv"));
+        job.addCacheFile(new URI(args[1]));
         FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[2]));
+        FileOutputFormat.setOutputPath(job, new Path(args[3]));
 
         boolean jobSuccess = job.waitForCompletion(true);
 
