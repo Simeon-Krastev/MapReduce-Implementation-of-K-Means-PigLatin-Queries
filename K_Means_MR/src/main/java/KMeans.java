@@ -217,28 +217,20 @@ public class KMeans {
     }
 
     public static class PointsGrouperReducer extends Reducer<Text, Text, Text, Text> {
+        private HashMap<String, String> output;
 
-        HashMap<String, String> output;
         @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
+        protected void setup(Context context) {
             output = new HashMap<>();
         }
+
         @Override
-        public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<Text> values, Context context) {
+            for (Text value : values) {
+                String groupKey = "Center " + key.toString() + ". Points: ";
+                String point = "(" + value.toString() + ")";
 
-            try {
-                for (Text value : values) {
-                    String ky = "Center " + key.toString() + ". Points: ";
-                    String val = "(" + value.toString() + ")";
-                    if (output.containsKey(ky)) {
-                        output.put(ky, output.get(ky) + "; " + val);
-                    } else {
-                        output.put(ky, val);
-                    }
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+                output.compute(groupKey, (k, v) -> (v == null) ? point : v + "; " + point);
             }
         }
 
