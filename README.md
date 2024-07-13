@@ -191,5 +191,6 @@ Performance was also compared on increasingly larger amounts of data points rang
 
 It seems like the bulk of the time being spent with the implementation of MapReduce is in reading and writing context files. While the performance reduction with SciKit-Learn between 100,000 and 1,000,000 data points is close to 8x, it slightly more than doubled with the MapReduce implementation. This means the solution is scalable and can even match SciKit-Learn’s at higher data volumes. A graph outlining the difference in performance between the two models can be found on the next page. A logarithmic scale on both axes shows that as the number of data points increases, the performance of both models becomes more similar. This is because the effect of I/O time penalties with MapReduce is less critical to its overall performance.
 
+![Time_Comparison_SKLearn_Java_MR](https://github.com/user-attachments/assets/d3c89e10-93b8-440f-b391-3aa36c21e66b)
 
 
