@@ -94,6 +94,8 @@ Runtimes for each task in MapReduce mode were timed and compared to performance 
 --- 
 
 # K-Means Clustering
+Premise: Develop a Java MapReduce implementation of the K-Means Clustering Algorithm
+
 ## Task 2.1 (Creation of Dataset)
 A Python script was written to create the necessary dataset using the random library and Pandas. A data frame of 5,000 pairs of integers between 0 and 1,000 and seed values were generated. Smaller and larger datasets were created for testing and later use.
 
