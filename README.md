@@ -1,7 +1,5 @@
 # FaceIn Network Exercise with Apage Pig
-
-Premise:
-## Creating Datasets for a FaceIn Big Data Application
+## Task Premise: Creating Datasets for a FaceIn Big Data Application
 Write a program (You are welcome to use a different programming language for that
 part, e.g., Python) that creates datasets related to a new social media application FaceIn,
 including the following datasets as three separate data files:
